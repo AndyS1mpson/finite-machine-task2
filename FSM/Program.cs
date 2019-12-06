@@ -22,14 +22,15 @@ namespace FSM
             //Функция переходов  δ(q0,0,z)=>(q1,0)
             Func<int, char, char, (int, string)> map = (state, input, topStack) => (state, input, topStack) switch
                       {
-                          (0, '0', 'Z') => (0, "0"),
+                          (0, '0', 'Z') => (0, "0Z"),
                           (0, '0', '0') => (0, "00"),
                           (0, '1', '0') => (1, "1"),
                           (1, '1', '1') => (1, "e"),
                           (1, '1', '0') => (1, "1"),
-                          (1, '0', 'Z') => (2, "0"),
+                          (1, '0', 'Z') => (2, "0Z"),
                           (2, '0', '0') => (1, "e"),
-                          (1, 'e', 'Z') => (2, "e")
+                          (1, 'e', 'Z') => (2, "e"),
+                           _  => (-1, "ignore")
                       };
             //Объект,являющийся автоматом 
             var fsm = new FSM()
@@ -39,92 +40,96 @@ namespace FSM
                 Map = map
             };
             //проверяемая стока
-            var start_input = "000011111111000000";
-            //число нулей до единиц
-            int n = 0;
-            //число нулей после последовательности единиц
-            int m = 0;
-            //индекс
-            int i = 0;
-            var stack_size = 0;
-            while (start_input[i] != '1' && i<start_input.Length)
-            {
-                n++;
-                i++;
-            }
-            for (int j = n; j < start_input.Length; j++)
-            {
-                if (start_input[j] == '0')
-                    m++;
-            }
-            if (n > m)
-                stack_size = n;
-            else stack_size = m;
+            //var start_input = "000011111111000000";
+            string start_input = Console.ReadLine();
             //строка,с символом пустой строки в конце для упрощения работы 
-            var input = start_input + "e";
-            
-            bool result = Result(fsm,input,stack_size);
-            Console.WriteLine(result);
+            string input = start_input + "e";
+            //Создаю переменную,в которую запишу результат работы автомата
+            var temp = Result(fsm, input);
+            bool result = temp.Item1;
+            int mistakeNumber = temp.Item2;
+            if (result == true)
+                Console.WriteLine(result);
+            else Console.WriteLine("С {0} номера пошло несоответствие", mistakeNumber);
         }
         //функция,реализующая работу автомата
-        static bool Result(FSM fsm,string input,int stack_size)
+        static (bool,int) Result(FSM fsm,string input)
         {
             //результат
             var result = false;
             //Стек
-            Stack<char> stack = new Stack<char>(stack_size);
+            Stack<char> stack = new Stack<char>();
+            //номер символа строки ,с которого пошло нессответствие строки автомату
+            int mistakeNumber = 0;
             //Сразу кладем в него "Z" (показатель дна)
             stack.Push('Z');
+
+            var canExecuteFSM = true;
             //Проверяем цепочку
-            for (int i = 0; i < input.Length; i++)
+            do
             {
-                var state = 0;
-                var canExecuteFSM = true;
-                var index = i;
-
-
-                do
+                int finish_state=0;
+                int state = 0;
+                for (int i = 0; i < input.Length; ++i)
                 {
+                    var index = i;
+
+
+
                     //Проверяем,принадлежит ли текущее состояние множеству состояний нашего автомата
                     if (fsm.States.ToList().Contains(state))
                     {
 
-                            if (index < input.Length)
+                        if (index < input.Length)
+                        {
+                            //вызываем функцию переходов
+                            var temp = fsm.Map(state, input[index], stack.Peek());
+                            state = temp.Item1;
+                            //проверяем,равно ли текущее состояние состоянию,не входящему в множество состояний
+                            //(фактически проверяем на несоответствие строки нашему автомату)
+                            if (state == -1)
                             {
-                                //вызываем функцию переходов
-                                var temp = fsm.Map(state, input[index], stack.Peek());
-                                state = temp.Item1;
-
-                            //Проверяем ,является ли записываемый в стек символ символов пустой строки
+                                mistakeNumber = index + 1;
+                                canExecuteFSM = false;
+                            }
+                            else
+                            //Проверяем ,является ли записываемый в стек символ символом пустой строки
                             if (temp.Item2[0] != 'e')
                             {
                                 //Стираю j-1 символ,где j-число элементов,которые надо записать в стек
-                                for(int k=0;k<temp.Item2.Length-1;k++)
-                                stack.Pop();
+                                if (temp.Item2.Length == 1)
+                                    stack.Pop();
+                                else
+                                for (int k = 0; k < temp.Item2.Length-1; k++)
+                                    stack.Pop();
                                 //Записываю j символов
                                 for (int j = temp.Item2.Length - 1; j >= 0; j--)
                                     stack.Push(temp.Item2[j]);
                             }
                             else stack.Pop();
-                            }
-                            else
-                            {
-                                canExecuteFSM = false;
-                            }
-                       
 
+                        }
+                        else
+                        {
+                            canExecuteFSM = false;
+                        }
                     }
                     else
                     {
                         canExecuteFSM = false;
                     }
+                    finish_state = state;
 
-                } while (canExecuteFSM);
+                }
                 //Проеряем ,является наш стек пустым после проверки цепочки
-                if (state==fsm.FiniteStates[0] && stack.Count==0)
+                if (finish_state == fsm.FiniteStates[0] && stack.Count == 0)
+                { 
                     result = true;
-            }
-            return result;
+                    canExecuteFSM = false;
+                }
+                
+            } while (canExecuteFSM);
+            return (result,mistakeNumber);
         }
     }
  

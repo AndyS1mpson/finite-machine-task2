@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Пользователь\\source\\repos\\FSM\\FSM\\FSM.csproj",
+      "projectUniqueName": "C:\\Users\\Пользователь\\Documents\\GitHub\\finite-machine-task2\\FSM\\FSM.csproj",
       "projectName": "FSM",
-      "projectPath": "C:\\Users\\Пользователь\\source\\repos\\FSM\\FSM\\FSM.csproj",
+      "projectPath": "C:\\Users\\Пользователь\\Documents\\GitHub\\finite-machine-task2\\FSM\\FSM.csproj",
       "packagesPath": "C:\\Users\\Пользователь\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Пользователь\\source\\repos\\FSM\\FSM\\obj\\",
+      "outputPath": "C:\\Users\\Пользователь\\Documents\\GitHub\\finite-machine-task2\\FSM\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

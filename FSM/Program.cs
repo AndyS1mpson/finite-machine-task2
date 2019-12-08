@@ -49,8 +49,12 @@ namespace FSM
             bool result = temp.Item1;
             int mistakeNumber = temp.Item2;
             if (result == true)
-                Console.WriteLine(result);
-            else Console.WriteLine("С {0} номера пошло несоответствие", mistakeNumber);
+                Console.WriteLine("Цепочка удовлетворяет языку");
+            else
+            {
+                Console.WriteLine("Цепочка не удовлетворяет языку");
+                Console.WriteLine("С {0} номера пошло несоответствие", mistakeNumber);
+            }
         }
         //функция,реализующая работу автомата
         static (bool,int) Result(FSM fsm,string input)

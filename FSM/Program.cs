@@ -22,25 +22,29 @@ namespace FSM
             //Функция переходов  δ(q0,0,z)=>(q1,0)
             Func<int, char, char, (int, string)> map = (state, input, topStack) => (state, input, topStack) switch
                       {
-                          (0, '0', 'Z') => (0, "0Z"),
-                          (0, '0', '0') => (0, "00"),
-                          (0, '1', '0') => (1, "1"),
-                          (1, '1', '1') => (1, "e"),
-                          (1, '1', '0') => (1, "1"),
-                          (1, '0', 'Z') => (2, "0Z"),
-                          (2, '0', '0') => (1, "e"),
-                          (1, 'e', 'Z') => (2, "e"),
+                          (0,'0','Z')=>(0,"0Z"),
+                          (0,'0','0')=>(0,"00"),
+                          (0,'(','0')=>(0,"0"),
+                          (0,'(','Z')=>(1,"(Z"),
+                          (0,'1','0')=>(2,"1"),
+                          (2,'1','1')=>(2,"e"),
+                          (2,'1','0')=>(2,"1"),
+                          (1,')','(')=>(3,"e"),
+                          (2,')','Z')=>(3,"Z"),
+                          (3,'0','Z')=>(4,"0Z"),
+                          (4,'0','0')=>(3,"e"),
+                          (3,'e','Z')=>(3,"e"),
                            _  => (-1, "ignore")
                       };
             //Объект,являющийся автоматом 
             var fsm = new FSM()
             {
-                States = new int[] { 0, 1, 2 },
-                FiniteStates = new int[] { 2 },
+                States = new int[] { 0, 1, 2, 3, 4},
+                FiniteStates = new int[] { 3 },
                 Map = map
             };
             //проверяемая стока
-            //var start_input = "000011111111000000";
+            //var start_input = "0000(11111111)000000";
             string start_input = Console.ReadLine();
             //строка,с символом пустой строки в конце для упрощения работы 
             string input = start_input + "e";
@@ -49,10 +53,10 @@ namespace FSM
             bool result = temp.Item1;
             int mistakeNumber = temp.Item2;
             if (result == true)
-                Console.WriteLine("Цепочка удовлетворяет языку");
+                Console.WriteLine("Автомат допускает данную цепочку");
             else
             {
-                Console.WriteLine("Цепочка не удовлетворяет языку");
+                Console.WriteLine("Автомат не допускает данную цепочку");
                 Console.WriteLine("С {0} номера пошло несоответствие", mistakeNumber);
             }
         }
